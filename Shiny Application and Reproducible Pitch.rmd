@@ -1,0 +1,48 @@
+---
+title: "Height Prediction of Children by 'GaltonFamilies' dataset"
+author: "Md. Moaz Ahmed Asif"
+date: "`r Sys.Date()`"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Course Project: Shiny Application and Reproducible Pitch
+
+In this application, I predicted children's height on the basis of their gender, father & mother's height, and midparentHeight. For more information on the dataset, go through - https://rdrr.io/cran/HistData/man/GaltonFamilies.html".
+
+The application is running on: https://moaz-ahmed-asif.shinyapps.io/Height_Prediction_by_GaltonFamilies/
+
+ui.R, and server.R Code is stored in the following repository: https://github.com/moaz-ahmed-asif/Shiny-Application-and-Reproducible-Pitch
+
+## Details of the data
+
+```{r, echo = T, comment = "", message = F}
+library(dplyr)
+library(HistData)
+data(GaltonFamilies)
+head(GaltonFamilies)
+```
+
+## Data manipulation
+
+At first, the heights were converted to meter.
+```{r, echo = T, comment = ""}
+newGalton <- GaltonFamilies %>% 
+        mutate(father = 2.54 * father / 100,
+               mother = 2.54 * mother / 100,
+               midparent = 2.54 * midparentHeight / 100,
+               child = 2.54 * childHeight / 100)
+
+summary(newGalton[c("father", "mother", "midparent", "child")])
+```
+
+## Fitting a model
+
+Then, father & mother height, gender of children, and midparent were fitted to a linear model to predict children height.
+```{r, echo = T}
+LM <- lm(child ~ father + mother + gender + midparent, newGalton)
+```
+Then, gender of children and father & mother height were taken input via radioGroupButtons, and sliderInput; midparent was calculated from the father & mother height. After that, children height is predicted and shown in the ggplot.
